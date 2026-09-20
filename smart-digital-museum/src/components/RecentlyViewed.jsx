@@ -1,7 +1,7 @@
 import React from 'react';
 import ArtifactCard from './ArtifactCard';
 
-export default function RecentlyViewed({ recentlyViewed = [] }) {
+export default function RecentlyViewed({ recentlyViewed = [], favorites = [], onFavorite, onViewDetails }) {
     return (
         <section id="recent" className="recent">
             <div className="section-heading">
@@ -13,9 +13,18 @@ export default function RecentlyViewed({ recentlyViewed = [] }) {
                 {recentlyViewed.length === 0 ? (
                     <p className="empty-message">You haven't viewed any artifacts yet.</p>
                 ) : (
-                    recentlyViewed.map((artifact) => (
-                        <ArtifactCard key={artifact.id} artifact={artifact} />
-                    ))
+                    recentlyViewed.map((artifact) => {
+                        const isFavorite = favorites.some((fav) => fav.id === artifact.id);
+                        return (
+                            <ArtifactCard
+                                key={artifact.id}
+                                artifact={artifact}
+                                isFavorite={isFavorite}
+                                onFavorite={onFavorite}
+                                onViewDetails={onViewDetails}
+                            />
+                        );
+                    })
                 )}
             </div>
         </section>

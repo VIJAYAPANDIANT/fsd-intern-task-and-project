@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ArtifactCard from './ArtifactCard';
 
-export default function ArtifactList({ artifacts = [], favorites = [], onFavorite, onViewDetails }) {
+export default function ArtifactList({ artifacts = [], onViewDetails }) {
     const [searchText, setSearchText] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [selectedPeriod, setSelectedPeriod] = useState('all');
@@ -127,18 +127,13 @@ export default function ArtifactList({ artifacts = [], favorites = [], onFavorit
             {/* ARTIFACT CARDS CONTAINER */}
             <div id="artifact-container" className="artifact-container">
                 {sortedArtifacts.length > 0 ? (
-                    sortedArtifacts.map((artifact) => {
-                        const isFavorite = favorites.some((fav) => fav.id === artifact.id);
-                        return (
-                            <ArtifactCard
-                                key={artifact.id}
-                                artifact={artifact}
-                                isFavorite={isFavorite}
-                                onFavorite={onFavorite}
-                                onViewDetails={onViewDetails}
-                            />
-                        );
-                    })
+                    sortedArtifacts.map((artifact) => (
+                        <ArtifactCard
+                            key={artifact.id}
+                            artifact={artifact}
+                            onViewDetails={onViewDetails}
+                        />
+                    ))
                 ) : (
                     <div className="empty-message">
                         <p>No artifacts found.</p>
