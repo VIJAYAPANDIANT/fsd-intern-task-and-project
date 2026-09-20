@@ -131,7 +131,7 @@ export default function App() {
   };
 
   return (
-    <div className={darkMode ? 'app dark' : 'app'}>
+    <div className={darkMode ? 'app dark min-h-screen bg-neutral-900 text-neutral-100 transition-colors duration-300' : 'app min-h-screen bg-neutral-50 text-neutral-900 transition-colors duration-300'}>
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
       <main>
         <Hero />
@@ -166,13 +166,13 @@ export default function App() {
 
       {/* FLOATING COMPARE BAR */}
       {compareList.length > 0 && (
-        <div id="compare-bar" className="compare-bar active">
+        <div id="compare-bar" className="compare-bar active fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900/95 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl z-[900] flex flex-col sm:flex-row items-center gap-3 border border-neutral-700 text-xs md:text-sm font-medium">
           <span id="compare-count">⚖️ Selected {compareList.length}/2 items to compare</span>
-          <div className="compare-actions">
+          <div className="compare-actions flex gap-2">
             {compareList.length === 2 && (
               <button
                 id="open-compare-btn"
-                className="compare-btn"
+                className="compare-btn px-4 py-1.5 bg-amber-400 hover:bg-amber-500 text-neutral-900 font-bold rounded-full transition-transform duration-200 hover:scale-105"
                 onClick={() => setIsCompareOpen(true)}
               >
                 Compare Now
@@ -180,7 +180,7 @@ export default function App() {
             )}
             <button
               id="clear-compare-btn"
-              className="clear-btn"
+              className="clear-btn px-3 py-1.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded-full transition-colors duration-200"
               onClick={handleClearCompare}
             >
               Clear Comparison
