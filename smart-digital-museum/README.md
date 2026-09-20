@@ -2,10 +2,13 @@
 
 An interactive, responsive React application built to explore historical artifacts, famous artworks, remarkable inventions, and cultural treasures from around the world, featuring an enriched collection of **Tamil Nadu, India cultural artifacts**. Built with a modern, accessible interface powered by **React 18**, **Vite**, **Tailwind CSS**, and **LocalStorage persistence**.
 
+🌐 **Live Application Link**: [Smart Digital Museum](https://fsd-intern-task-and-project.vercel.app/)
+
 ---
 
 ## 🌟 Features
 
+* **🌐 Live Deployment**: Hosted live on Vercel at [fsd-intern-task-and-project.vercel.app](https://fsd-intern-task-and-project.vercel.app/).
 * **🔍 Real-time Search**: Search artifacts dynamically by title, creator, or description keywords.
 * **🏷️ Category & Period Filtering**: Filter collections by category (*Ancient Artifacts*, *Famous Artworks*, *Great Inventions*, *Cultural Heritage*) and historical period (*Ancient*, *Renaissance*, *Medieval*, *Industrial*).
 * **🇮🇳 Tamil Nadu Artifacts Collection**: Includes 8 authentic Tamil Nadu heritage items (Chola Nataraja Bronze, Brihadisvara Temple reliefs, Mahabalipuram Shore Temple, Tanjore Paintings, Madurai Musical Pillars, Kanchipuram Silk Loom, etc.).
@@ -49,6 +52,7 @@ An interactive, responsive React application built to explore historical artifac
 * **Language**: JavaScript (ES6+)
 * **Styling**: Tailwind CSS 3 & PostCSS
 * **State & Persistence**: React Hooks (`useState`, `useEffect`) & Browser `localStorage`
+* **Deployment**: Vercel
 
 ---
 
@@ -58,7 +62,7 @@ An interactive, responsive React application built to explore historical artifac
 smart-digital-museum/
 ├── .vscode/
 │   └── settings.json       # Editor CSS linter config for Tailwind directives
-├── public/                 # Static assets & favicon
+├── public/                 # Static assets & favicon SVG
 ├── src/
 │   ├── components/
 │   │   ├── ArtifactCard.jsx    # Artifact card UI with year badges & image error handling
@@ -67,7 +71,7 @@ smart-digital-museum/
 │   │   ├── Categories.jsx      # Collection category cards
 │   │   ├── CompareModal.jsx    # Side-by-side artifact comparison modal
 │   │   ├── Favorites.jsx       # Saved favorites section
-   │   ├── Footer.jsx          # App footer
+│   │   ├── Footer.jsx          # App footer
 │   │   ├── Hero.jsx            # Hero banner section
 │   │   ├── Museum.jsx          # Virtual museum room selection
 │   │   ├── Navbar.jsx          # Top navigation & theme toggle
@@ -114,6 +118,12 @@ smart-digital-museum/
    ```bash
    npm run preview
    ```
+
+---
+
+## 🔗 Live Application
+
+Visit the live app: [Smart Digital Museum](https://fsd-intern-task-and-project.vercel.app/)
 
 ---
 

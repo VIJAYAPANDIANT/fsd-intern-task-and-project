@@ -2,13 +2,15 @@
 
 Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This repository contains the project code, tasks, and full-stack development implementations completed during the internship.
 
+🌐 **Live Application Link**: [Smart Digital Museum](https://fsd-intern-task-and-project.vercel.app/)
+
 ---
 
 ## 📂 Repository Overview
 
-| Directory | Description | Tech Stack | Status |
-| :--- | :--- | :--- | :--- |
-| [**`smart-digital-museum/`**](./smart-digital-museum) | Interactive Smart Digital Museum web app featuring 12 artifacts (including 8 Tamil Nadu heritage items), real-time search, filtering, comparison, room tours, year badges, image fallbacks, and dark mode. | React 18, Vite, Tailwind CSS, LocalStorage | **Completed** 🚀 |
+| Directory | Description | Live Demo | Tech Stack | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| [**`smart-digital-museum/`**](./smart-digital-museum) | Interactive Smart Digital Museum web app featuring 12 artifacts (including 8 Tamil Nadu heritage items), real-time search, filtering, comparison, room tours, year badges, image fallbacks, and dark mode. | [🌐 Live Demo](https://fsd-intern-task-and-project.vercel.app/) | React 18, Vite, Tailwind CSS, LocalStorage | **Completed** 🚀 |
 
 ---
 
@@ -17,6 +19,7 @@ Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This
 The primary application in this repository is the **Smart Digital Museum**, a modern web application designed for exploring historical artifacts, famous artworks, and cultural treasures worldwide, with a dedicated highlight on **Tamil Nadu, India cultural heritage**.
 
 ### Key Highlights
+* **🌐 Live Deployment**: Hosted on Vercel at [fsd-intern-task-and-project.vercel.app](https://fsd-intern-task-and-project.vercel.app/).
 * **React 18 & Vite**: Built with high-performance modular components.
 * **Tailwind CSS**: Modern responsive styling with custom gold branding and dark mode support.
 * **Enriched Artifact Dataset**: 12 curated historical artifacts including 8 Tamil Nadu items (Chola Nataraja Bronze, Brihadisvara Temple reliefs, Mahabalipuram Shore Temple, Tanjore Paintings, Madurai Musical Pillars, Kanchipuram Silk Loom, etc.).
@@ -59,6 +62,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser to view the 
 * **Frontend**: React.js 18, HTML5, CSS3, JavaScript (ES6+)
 * **Styling**: Tailwind CSS 3, PostCSS, Autoprefixer
 * **Build System**: Vite 5
+* **Deployment**: Vercel
 * **Version Control**: Git & GitHub
 
 ---
