@@ -3,11 +3,14 @@ import React from 'react';
 export default function Navbar({ darkMode, setDarkMode }) {
     return (
         <header className="navbar flex justify-between items-center px-4 md:px-[5%] py-4 bg-neutral-900 text-white transition-colors duration-300 dark:bg-neutral-950 border-b border-neutral-800">
-            <div className="logo text-xl md:text-2xl font-bold tracking-wide flex items-center gap-2">
-                🏛️ Smart Museum
-            </div>
+            <a href="#home" className="logo text-xl md:text-2xl font-bold tracking-wide flex items-center gap-3 group">
+                <img src="/favicon.svg" alt="Smart Digital Museum Logo" className="w-8 h-8 rounded-lg group-hover:scale-105 transition-transform duration-200 shadow-sm" />
+                <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent font-extrabold">
+                    Smart Museum
+                </span>
+            </a>
 
-            <nav className="nav-links hidden sm:flex items-center space-x-6 text-sm md:text-base">
+            <nav className="nav-links hidden sm:flex items-center space-x-6 text-sm md:text-base font-medium">
                 <a href="#home" className="hover:text-amber-400 transition-colors duration-200">Home</a>
                 <a href="#explore" className="hover:text-amber-400 transition-colors duration-200">Explore</a>
                 <a href="#museum" className="hover:text-amber-400 transition-colors duration-200">Museum</a>
