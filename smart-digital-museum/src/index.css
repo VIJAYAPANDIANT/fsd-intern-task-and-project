@@ -1,33 +1,41 @@
-body {
+body, .app {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-body.dark-theme {
+body.dark-theme,
+.app.dark {
     background: #121212;
     color: #e0e0e0;
 }
 
-body.dark-theme .navbar {
+body.dark-theme .navbar,
+.app.dark .navbar {
     background: #1a1a1a;
     border-bottom: 1px solid #333;
 }
 
 body.dark-theme .category-card,
 body.dark-theme .artifact-card,
-body.dark-theme .modal-content {
+body.dark-theme .modal-content,
+.app.dark .category-card,
+.app.dark .artifact-card,
+.app.dark .modal-content {
     background: #1e1e1e;
     color: #e0e0e0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 body.dark-theme #search-input,
-body.dark-theme .filters select {
+body.dark-theme .filters select,
+.app.dark #search-input,
+.app.dark .filters select {
     background: #2a2a2a;
     color: #fff;
     border: 1px solid #444;
 }
 
-body.dark-theme #search-button {
+body.dark-theme #search-button,
+.app.dark #search-button {
     background: #f0b45b;
     color: #121212;
 }

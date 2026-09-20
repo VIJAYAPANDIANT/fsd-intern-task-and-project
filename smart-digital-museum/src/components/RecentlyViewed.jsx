@@ -1,7 +1,7 @@
 import React from 'react';
 import ArtifactCard from './ArtifactCard';
 
-export default function RecentlyViewed({ recentlyViewed = [], favorites = [], onFavorite, onViewDetails }) {
+export default function RecentlyViewed({ recentlyViewed = [], favorites = [], onFavorite, compareList = [], onCompare, onViewDetails }) {
     return (
         <section id="recent" className="recent">
             <div className="section-heading">
@@ -15,12 +15,15 @@ export default function RecentlyViewed({ recentlyViewed = [], favorites = [], on
                 ) : (
                     recentlyViewed.map((artifact) => {
                         const isFavorite = favorites.some((fav) => fav.id === artifact.id);
+                        const isCompared = compareList.some((comp) => comp.id === artifact.id);
                         return (
                             <ArtifactCard
                                 key={artifact.id}
                                 artifact={artifact}
                                 isFavorite={isFavorite}
                                 onFavorite={onFavorite}
+                                isCompared={isCompared}
+                                onCompare={onCompare}
                                 onViewDetails={onViewDetails}
                             />
                         );

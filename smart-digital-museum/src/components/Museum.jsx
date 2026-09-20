@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Museum() {
+export default function Museum({ onRoomSelect }) {
     return (
         <section id="museum" className="museum">
             <div className="section-heading">
@@ -16,28 +16,36 @@ export default function Museum() {
                     <span>🏺</span>
                     <h3>Ancient World</h3>
                     <p>Ancient civilizations and artifacts</p>
-                    <button>Enter Room</button>
+                    <button onClick={() => onRoomSelect && onRoomSelect('Ancient Artifacts')}>
+                        Enter Room
+                    </button>
                 </article>
 
                 <article className="museum-room">
                     <span>🎨</span>
                     <h3>Art Gallery</h3>
                     <p>Famous paintings and artworks</p>
-                    <button>Enter Room</button>
+                    <button onClick={() => onRoomSelect && onRoomSelect('Famous Artworks')}>
+                        Enter Room
+                    </button>
                 </article>
 
                 <article className="museum-room">
                     <span>⚙️</span>
                     <h3>Inventions</h3>
                     <p>Discover inventions that changed humanity</p>
-                    <button>Enter Room</button>
+                    <button onClick={() => onRoomSelect && onRoomSelect('Great Inventions')}>
+                        Enter Room
+                    </button>
                 </article>
 
                 <article className="museum-room">
                     <span>🇮🇳</span>
                     <h3>Cultural Heritage</h3>
                     <p>Explore cultural treasures</p>
-                    <button>Enter Room</button>
+                    <button onClick={() => onRoomSelect && onRoomSelect('Cultural Heritage')}>
+                        Enter Room
+                    </button>
                 </article>
             </div>
         </section>

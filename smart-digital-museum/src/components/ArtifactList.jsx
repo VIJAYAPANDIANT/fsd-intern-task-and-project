@@ -1,11 +1,30 @@
 import React, { useState } from 'react';
 import ArtifactCard from './ArtifactCard';
 
-export default function ArtifactList({ artifacts = [], favorites = [], onFavorite, onViewDetails }) {
+export default function ArtifactList({
+    artifacts = [],
+    favorites = [],
+    onFavorite,
+    compareList = [],
+    onCompare,
+    onViewDetails,
+    selectedCategory: propCategory,
+    onCategoryChange
+}) {
     const [searchText, setSearchText] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [internalCategory, setInternalCategory] = useState('all');
     const [selectedPeriod, setSelectedPeriod] = useState('all');
     const [selectedSort, setSelectedSort] = useState('default');
+
+    const selectedCategory = propCategory !== undefined ? propCategory : internalCategory;
+
+    const handleCategoryChange = (category) => {
+        if (onCategoryChange) {
+            onCategoryChange(category);
+        } else {
+            setInternalCategory(category);
+        }
+    };
 
     // 1. Filter artifacts based on Search, Category, and Period
     const filteredArtifacts = artifacts.filter((artifact) => {
@@ -42,7 +61,7 @@ export default function ArtifactList({ artifacts = [], favorites = [], onFavorit
 
     const handleClearFilters = () => {
         setSearchText('');
-        setSelectedCategory('all');
+        handleCategoryChange('all');
         setSelectedPeriod('all');
         setSelectedSort('default');
     };
@@ -75,7 +94,7 @@ export default function ArtifactList({ artifacts = [], favorites = [], onFavorit
                 <select
                     id="category-filter"
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
                     aria-label="Filter by category"
                     title="Filter by category"
                 >
@@ -129,12 +148,15 @@ export default function ArtifactList({ artifacts = [], favorites = [], onFavorit
                 {sortedArtifacts.length > 0 ? (
                     sortedArtifacts.map((artifact) => {
                         const isFavorite = favorites.some((fav) => fav.id === artifact.id);
+                        const isCompared = compareList.some((comp) => comp.id === artifact.id);
                         return (
                             <ArtifactCard
                                 key={artifact.id}
                                 artifact={artifact}
                                 isFavorite={isFavorite}
                                 onFavorite={onFavorite}
+                                isCompared={isCompared}
+                                onCompare={onCompare}
                                 onViewDetails={onViewDetails}
                             />
                         );

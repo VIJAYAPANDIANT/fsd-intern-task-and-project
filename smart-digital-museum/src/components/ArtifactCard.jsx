@@ -1,6 +1,13 @@
 import React from 'react';
 
-export default function ArtifactCard({ artifact, onViewDetails, onFavorite, isFavorite = false }) {
+export default function ArtifactCard({
+    artifact,
+    onViewDetails,
+    onFavorite,
+    isFavorite = false,
+    onCompare,
+    isCompared = false
+}) {
     if (!artifact) return null;
 
     return (
@@ -23,6 +30,12 @@ export default function ArtifactCard({ artifact, onViewDetails, onFavorite, isFa
                             onClick={() => onFavorite && onFavorite(artifact)}
                         >
                             {isFavorite ? '❤️ Favorited' : '🤍 Favorite'}
+                        </button>
+                        <button
+                            className={`btn-compare ${isCompared ? 'active' : ''}`}
+                            onClick={() => onCompare && onCompare(artifact)}
+                        >
+                            {isCompared ? '⚖️ Compared' : '⚖️ Compare'}
                         </button>
                     </div>
                 </div>

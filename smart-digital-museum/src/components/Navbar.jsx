@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Navbar() {
+export default function Navbar({ darkMode, setDarkMode }) {
     return (
         <header className="navbar">
             <div className="logo">
@@ -15,8 +15,13 @@ export default function Navbar() {
                 <a href="#recent">Recently Viewed</a>
             </nav>
 
-            <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-                🌙
+            <button
+                id="theme-toggle"
+                aria-label="Toggle theme"
+                title="Toggle theme"
+                onClick={() => setDarkMode && setDarkMode(!darkMode)}
+            >
+                {darkMode ? "☀️" : "🌙"}
             </button>
         </header>
     );

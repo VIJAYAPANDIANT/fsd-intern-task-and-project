@@ -1,7 +1,7 @@
 import React from 'react';
 import ArtifactCard from './ArtifactCard';
 
-export default function Favorites({ favorites = [], onRemoveFavorite, onViewDetails }) {
+export default function Favorites({ favorites = [], onRemoveFavorite, compareList = [], onCompare, onViewDetails }) {
     return (
         <section id="favorites" className="favorites">
             <div className="section-heading">
@@ -13,15 +13,20 @@ export default function Favorites({ favorites = [], onRemoveFavorite, onViewDeta
                 {favorites.length === 0 ? (
                     <p className="empty-message">No favorite artifacts yet.</p>
                 ) : (
-                    favorites.map((artifact) => (
-                        <ArtifactCard
-                            key={artifact.id}
-                            artifact={artifact}
-                            isFavorite={true}
-                            onFavorite={onRemoveFavorite}
-                            onViewDetails={onViewDetails}
-                        />
-                    ))
+                    favorites.map((artifact) => {
+                        const isCompared = compareList.some((comp) => comp.id === artifact.id);
+                        return (
+                            <ArtifactCard
+                                key={artifact.id}
+                                artifact={artifact}
+                                isFavorite={true}
+                                onFavorite={onRemoveFavorite}
+                                isCompared={isCompared}
+                                onCompare={onCompare}
+                                onViewDetails={onViewDetails}
+                            />
+                        );
+                    })
                 )}
             </div>
         </section>
