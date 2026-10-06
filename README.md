@@ -2,7 +2,7 @@
 
 Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This repository contains the project code, tasks, and full-stack development implementations completed during the internship.
 
-🌐 **Live Application Link**: [Smart Digital Museum](https://fsd-intern-task-and-project.vercel.app/)
+🌐 **Live Application Link**: [Smart Digital Museum](https://smart-digital-musem.vercel.app/)
 
 ---
 
@@ -10,7 +10,7 @@ Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This
 
 | Directory                                             | Description                                                                                                                                                                                                | Live Demo                                                       | Tech Stack                                 | Status           |
 | :---------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------- | :----------------------------------------- | :--------------- |
-| [**`smart-digital-museum/`**](./smart-digital-museum) | Interactive Smart Digital Museum web app featuring 12 artifacts (including 8 Tamil Nadu heritage items), real-time search, filtering, comparison, room tours, year badges, image fallbacks, and dark mode. | [🌐 Live Demo](https://fsd-intern-task-and-project.vercel.app/) | React 18, Vite, Tailwind CSS, LocalStorage | **Completed** 🚀 |
+| [**`smart-digital-museum/`**](./smart-digital-museum) | Interactive Smart Digital Museum web app featuring 12 artifacts (including 8 Tamil Nadu heritage items), real-time search, filtering, comparison, room tours, year badges, image fallbacks, and dark mode. | [🌐 Live Demo](https://smart-digital-musem.vercel.app/) | React 18, Vite, Tailwind CSS, LocalStorage | **Completed** 🚀 |
 
 ---
 
@@ -20,7 +20,7 @@ The primary application in this repository is the **Smart Digital Museum**, a mo
 
 ### Key Highlights
 
-- **🌐 Live Deployment**: Hosted on Vercel at [fsd-intern-task-and-project.vercel.app](https://fsd-intern-task-and-project.vercel.app/).
+- **🌐 Live Deployment**: Hosted on Vercel at [smart-digital-musem.vercel.app](https://smart-digital-musem.vercel.app/).
 - **React 18 & Vite**: Built with high-performance modular components.
 - **Tailwind CSS**: Modern responsive styling with custom gold branding and dark mode support.
 - **Enriched Artifact Dataset**: 12 curated historical artifacts including 8 Tamil Nadu items (Chola Nataraja Bronze, Brihadisvara Temple reliefs, Mahabalipuram Shore Temple, Tanjore Paintings, Madurai Musical Pillars, Kanchipuram Silk Loom, etc.).

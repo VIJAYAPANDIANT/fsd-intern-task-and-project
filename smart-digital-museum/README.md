@@ -2,13 +2,13 @@
 
 An interactive, responsive React application built to explore historical artifacts, famous artworks, remarkable inventions, and cultural treasures from around the world, featuring an enriched collection of **Tamil Nadu, India cultural artifacts**. Built with a modern, accessible interface powered by **React 18**, **Vite**, **Tailwind CSS**, and **LocalStorage persistence**.
 
-🌐 **Live Application Link**: [Smart Digital Museum](https://fsd-intern-task-and-project.vercel.app/)
+🌐 **Live Application Link**: [Smart Digital Museum](https://smart-digital-musem.vercel.app/)
 
 ---
 
 ## 🌟 Features
 
-- **🌐 Live Deployment**: Hosted live on Vercel at [fsd-intern-task-and-project.vercel.app](https://fsd-intern-task-and-project.vercel.app/).
+- **🌐 Live Deployment**: Hosted live on Vercel at [smart-digital-musem.vercel.app](https://smart-digital-musem.vercel.app/).
 - **🔍 Real-time Search**: Search artifacts dynamically by title, creator, or description keywords.
 - **🏷️ Category & Period Filtering**: Filter collections by category (_Ancient Artifacts_, _Famous Artworks_, _Great Inventions_, _Cultural Heritage_) and historical period (_Ancient_, _Renaissance_, _Medieval_, _Industrial_).
 - **🇮🇳 Tamil Nadu Artifacts Collection**: Includes 8 authentic Tamil Nadu heritage items (Chola Nataraja Bronze, Brihadisvara Temple reliefs, Mahabalipuram Shore Temple, Tanjore Paintings, Madurai Musical Pillars, Kanchipuram Silk Loom, etc.).
@@ -128,7 +128,7 @@ smart-digital-museum/
 
 ## 🔗 Live Application
 
-Visit the live app: [Smart Digital Museum](https://fsd-intern-task-and-project.vercel.app/)
+Visit the live app: [Smart Digital Museum](https://smart-digital-musem.vercel.app/)
 
 ---
 
