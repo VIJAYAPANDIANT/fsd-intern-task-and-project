@@ -104,9 +104,9 @@ Ensure the following tools are installed on your machine before running the proj
 ## 🚀 Installation Instructions
 
 ### 1. Repository Setup
-Navigate to the root of the existing repository:
+Navigate to the project directory:
 ```bash
-cd "c:\FSD Intern\smart-medicine-reminder-health-tracker"
+cd smart-medicine-reminder-health-tracker
 ```
 
 ### 2. Backend Dependencies
@@ -127,11 +127,11 @@ npm install
 
 ## 💻 Commands to Run Frontend and Backend
 
-The application consists of two decoupled services that should run concurrently in separate terminals:
+The application consists of two decoupled services that run concurrently in separate terminals:
 
 ### Terminal 1: Backend Server (Node.js + Express)
 ```bash
-cd "c:\FSD Intern\smart-medicine-reminder-health-tracker\server"
+cd smart-medicine-reminder-health-tracker/server
 npm run dev
 ```
 - **Backend URL**: `http://localhost:5000`
@@ -139,7 +139,7 @@ npm run dev
 
 ### Terminal 2: Frontend Client (Vite + React)
 ```bash
-cd "c:\FSD Intern\smart-medicine-reminder-health-tracker\client"
+cd smart-medicine-reminder-health-tracker/client
 npm run dev
 ```
 - **Frontend URL**: `http://localhost:5173`
