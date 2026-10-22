@@ -11,7 +11,7 @@ Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This
 | Directory | Description | Live Demo / Status | Tech Stack | Progress |
 | :--- | :--- | :--- | :--- | :--- |
 | [**`smart-digital-museum/`**](./smart-digital-museum) | Interactive Smart Digital Museum web app featuring 12 artifacts (including 8 Tamil Nadu heritage items), real-time search, filtering, comparison, room tours, year badges, image fallbacks, and dark mode. | [🌐 Live Demo](https://smart-digital-musem.vercel.app/) | React 18, Vite, Tailwind CSS, LocalStorage | **Completed** 🚀 |
-| [**`smart-medicine-reminder-health-tracker/`**](./smart-medicine-reminder-health-tracker) | Full-stack application for managing medication schedules, real-time reminders, adherence tracking (Taken/Missed/Pending), and daily health vitals monitoring. | Localhost (Backend: `:5000`, Client: `:5173`) | React 18, Vite, Tailwind CSS, Node.js, Express, JSON Storage | **Task 1: Setup Done** 🔄 |
+| [**`smart-medicine-reminder-health-tracker/`**](./smart-medicine-reminder-health-tracker) | Full-stack application for managing medication schedules, real-time reminders, adherence tracking (Taken/Missed/Pending), and daily health vitals monitoring. | Localhost (Backend: `:5000`, Client: `:5173`) | React 18, Vite, Tailwind CSS, Node.js, Express, JWT, bcryptjs, JSON Storage | **Step 2: Auth Done** 🔐 |
 
 ---
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Pill, Activity, Calendar, History, LogIn, UserPlus } from 'lucide-react';
+import { Pill, Activity, Calendar, History, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 
-export default function Navbar({ activePage, setActivePage, backendStatus }) {
+export default function Navbar({ activePage, setActivePage, backendStatus, user, onLogout }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Activity },
     { id: 'medicines', label: 'Medicines', icon: Pill },
@@ -20,7 +20,7 @@ export default function Navbar({ activePage, setActivePage, backendStatus }) {
           {/* Logo / Brand */}
           <div
             className="flex items-center space-x-3 cursor-pointer"
-            onClick={() => setActivePage('dashboard')}
+            onClick={() => setActivePage(user ? 'dashboard' : 'login')}
           >
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
               <Pill className="h-6 w-6" />
@@ -58,8 +58,8 @@ export default function Navbar({ activePage, setActivePage, backendStatus }) {
           </nav>
 
           {/* Right Section: Backend API Indicator & Auth Navigation */}
-          <div className="flex items-center space-x-2">
-            {/* Health pill */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Backend health status pill */}
             <div
               className={`hidden lg:flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
                 backendStatus === 'online'
@@ -76,27 +76,44 @@ export default function Navbar({ activePage, setActivePage, backendStatus }) {
               <span>API: {backendStatus === 'online' ? 'Connected' : 'Connecting...'}</span>
             </div>
 
-            {/* Auth Buttons */}
-            <div className="flex items-center space-x-1">
-              {authItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activePage === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActivePage(item.id)}
-                    className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      isActive
-                        ? 'bg-slate-900 text-white'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+            {/* Authenticated user menu vs Public Auth buttons */}
+            {user ? (
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="flex items-center space-x-2 px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-semibold text-slate-700">
+                  <User className="h-3.5 w-3.5 text-brand-600" />
+                  <span className="max-w-[120px] truncate">{user.name}</span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors"
+                  title="Sign out of MediTrack"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-1">
+                {authItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activePage === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActivePage(item.id)}
+                      className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        isActive
+                          ? 'bg-slate-900 text-white'
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

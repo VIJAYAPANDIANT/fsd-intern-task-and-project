@@ -3,7 +3,7 @@ import Card from '../components/Card';
 import StatusBadge from '../components/StatusBadge';
 import { Activity, Clock, CheckCircle2, XCircle, AlertCircle, TrendingUp, Calendar, Heart } from 'lucide-react';
 
-export default function Dashboard({ setActivePage, backendHealth }) {
+export default function Dashboard({ setActivePage, backendHealth, user }) {
   // Placeholder mock data demonstrating upcoming features
   const stats = [
     { label: "Today's Medicines", value: '4', icon: Calendar, color: 'text-brand-600 bg-brand-50' },
@@ -26,13 +26,13 @@ export default function Dashboard({ setActivePage, backendHealth }) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-semibold tracking-wide uppercase mb-2">
-              Phase 1 &bull; Project Setup Ready
+              Step 2 &bull; Authenticated Session
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Good day! Welcome to MediTrack
+              Good day, {user?.name || 'MediTrack User'}!
             </h1>
             <p className="text-teal-100 text-sm mt-1 max-w-xl">
-              Track your scheduled dosages, monitor your daily health adherence, and keep vital indicators in check.
+              Signed in as <code className="bg-white/20 px-1.5 py-0.5 rounded text-white font-mono text-xs">{user?.email || 'authenticated'}</code>. Track your scheduled dosages and health vitals.
             </p>
           </div>
           <button
