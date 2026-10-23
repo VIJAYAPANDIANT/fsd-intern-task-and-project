@@ -49,7 +49,8 @@ smart-medicine-reminder-health-tracker/
 ├── README.md
 ├── postman/
 │   ├── MediTrack_Step2_Auth.postman_collection.json
-│   └── MediTrack_Step3_Medicines.postman_collection.json
+│   ├── MediTrack_Step3_Medicines.postman_collection.json
+│   └── MediTrack_Step4_Tracking_History.postman_collection.json
 ├── client/
 │   ├── .env
 │   ├── .env.example
@@ -76,7 +77,8 @@ smart-medicine-reminder-health-tracker/
 │       │   ├── Medicines.jsx
 │       │   └── Register.jsx
 │       └── services/
-│           └── medicineService.js
+│           ├── medicineService.js
+│           └── recordService.js
 └── server/
     ├── .env
     ├── .env.example
@@ -85,10 +87,11 @@ smart-medicine-reminder-health-tracker/
     ├── controllers/
     │   ├── authController.js
     │   ├── healthController.js
-    │   └── medicineController.js
+    │   ├── medicineController.js
+    │   └── recordController.js
     ├── data/
     │   ├── README.md
-    │   ├── history.json
+    │   ├── medicationRecords.json
     │   ├── medicines.json
     │   └── users.json
     ├── middleware/
@@ -97,9 +100,11 @@ smart-medicine-reminder-health-tracker/
     ├── routes/
     │   ├── authRoutes.js
     │   ├── healthRoutes.js
-    │   └── medicineRoutes.js
+    │   ├── medicineRoutes.js
+    │   └── recordRoutes.js
     ├── services/
     │   ├── medicineService.js
+    │   ├── recordService.js
     │   └── userService.js
     └── utils/
         └── jsonStorage.js
@@ -146,10 +151,64 @@ All medicine routes are protected and require a valid Bearer JWT:
 
 ---
 
+## 📅 Daily Medication Tracking, Progress & History (Step 4)
+
+All tracking and history routes are protected and require a valid Bearer JWT:
+`Authorization: Bearer <token>`
+
+| Method | Endpoint | Description | Status Codes |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/records/today` | Generates or retrieves today's scheduled doses for active prescriptions. Returns doses with calculated adherence metrics (`total`, `taken`, `missed`, `pending`, `adherenceRate`). | `200`, `401` |
+| **PATCH** | `/api/records/:id/status` | Updates the status of a scheduled dose (`Pending`, `Taken`, `Missed`). Setting `Taken` sets `takenAt = ISO string`; setting `Missed` or `Pending` sets `takenAt = null`. Enforces strict dose ownership. | `200`, `400`, `401`, `404` |
+| **GET** | `/api/records/history` | Retrieves user's medication history logs. Supports optional query filters: `?date=YYYY-MM-DD` and `?status=Pending\|Taken\|Missed`. | `200`, `400`, `401` |
+
+### Medication Record Data Model (`medicationRecords.json`)
+```json
+{
+  "id": "rec_1792775417787_abc123",
+  "userId": "usr_alice_123",
+  "medicineId": "med_1792775417787_6d8d71f8",
+  "scheduledDate": "2026-10-23",
+  "scheduledTime": "08:00",
+  "status": "Taken",
+  "takenAt": "2026-10-23T08:15:22.000Z",
+  "createdAt": "2026-10-23T00:00:00.000Z",
+  "updatedAt": "2026-10-23T08:15:22.000Z"
+}
+```
+
+### Auto-Schedule Generation Logic
+- **Active Prescription Window**: A medicine is eligible for schedule generation on date $D$ if `startDate <= D` and (`!endDate` or `endDate >= D`).
+- **Dose Generation**: Creates one scheduled dose record per entry in the prescription's `reminderTimes` array.
+- **Idempotent & Deduplicated**: Before inserting, checks if a record with `(userId, medicineId, scheduledDate, scheduledTime)` already exists. Existing records and their current statuses are preserved.
+- **Timezone Consistency**: Generates and checks schedules using the local server date (`YYYY-MM-DD`).
+- **Frontend Independence**: The frontend never generates or inserts dose rows directly; simply calling `GET /api/records/today` triggers safe server-side generation.
+
+### Real-Time Adherence Calculation
+```text
+Adherence Rate (%) = total > 0 ? Math.round((taken / total) * 100) : 0
+```
+Included in the response of `GET /api/records/today`:
+```json
+{
+  "summary": {
+    "date": "2026-10-23",
+    "total": 3,
+    "taken": 2,
+    "missed": 0,
+    "pending": 1,
+    "adherenceRate": 67
+  },
+  "records": [...]
+}
+```
+
+---
+
 ## 🗄️ JSON Persistence & Concurrency
 
-- **No Database**: Prescriptions are persisted in [`server/data/medicines.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/server/data/medicines.json).
-- **Atomic File Writes**: The utility writes data to a temporary file (`.medicines.json.tmp-...`) and then executes an atomic rename (`fs.rename`). This prevents corrupt or truncated files if a process crashes mid-write.
+- **No Database**: Prescriptions are persisted in [`server/data/medicines.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/server/data/medicines.json) and dose records in [`server/data/medicationRecords.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/server/data/medicationRecords.json).
+- **Atomic File Writes**: The utility writes data to a temporary file (`.filename.json.tmp-...`) and then executes an atomic rename (`fs.rename`). This prevents corrupt or truncated files if a process crashes mid-write.
 - **In-Memory Write Queue**: File write operations are serialized using promise chains in [`server/utils/jsonStorage.js`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/server/utils/jsonStorage.js) to avoid race conditions.
 - **Architecture Limitation Note**: File-based JSON storage is ideal for this single-node internship project and local testing. In enterprise multi-instance or clustered production environments, an ACID-compliant database with row/document locking would be necessary.
 
@@ -168,6 +227,7 @@ npm run dev
 - **Health Check Endpoint**: `http://localhost:5000/api/health`
 - **Auth Endpoint**: `http://localhost:5000/api/auth`
 - **Medicines API**: `http://localhost:5000/api/medicines`
+- **Records API**: `http://localhost:5000/api/records`
 
 ### Terminal 2: Frontend Client (Vite + React)
 ```bash
@@ -180,21 +240,21 @@ npm run dev
 
 ## 📮 Postman API Testing Guide
 
-An importable Postman collection is included at:  
-[`postman/MediTrack_Step3_Medicines.postman_collection.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/MediTrack_Step3_Medicines.postman_collection.json)
+Importable Postman collections are located in [`smart-medicine-reminder-health-tracker/postman/`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/):
+1. [`MediTrack_Step2_Auth.postman_collection.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/MediTrack_Step2_Auth.postman_collection.json)
+2. [`MediTrack_Step3_Medicines.postman_collection.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/MediTrack_Step3_Medicines.postman_collection.json)
+3. [`MediTrack_Step4_Tracking_History.postman_collection.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/MediTrack_Step4_Tracking_History.postman_collection.json)
 
-### Tested Scenarios:
-1. **Login User A** &mdash; `POST /api/auth/login` &rarr; `200 OK` (captures `authToken`)
-2. **Create Medicine** &mdash; `POST /api/medicines` &rarr; `201 Created` (captures `medicineId`)
-3. **List Medicines** &mdash; `GET /api/medicines` &rarr; `200 OK` (returns array of User A's medicines)
-4. **Get One Medicine** &mdash; `GET /api/medicines/:id` &rarr; `200 OK`
-5. **Update Medicine** &mdash; `PUT /api/medicines/:id` &rarr; `200 OK` (updates dosage & notes)
-6. **Request Without Token** &mdash; `GET /api/medicines` &rarr; `401 Unauthorized`
-7. **Request Nonexistent Medicine** &mdash; `GET /api/medicines/med_nonexistent` &rarr; `404 Not Found`
-8. **Cross-User Isolation** &mdash; User B requests User A's medicine &rarr; `404 Not Found`
-9. **Invalid Reminder Times** &mdash; `POST /api/medicines` with `["25:99"]` &rarr; `400 Bad Request`
-10. **Invalid Date Order** &mdash; `POST /api/medicines` with `endDate < startDate` &rarr; `400 Bad Request`
-11. **Delete Medicine** &mdash; `DELETE /api/medicines/:id` &rarr; `200 OK`
+### Step 4 Tested Scenarios:
+1. **Login User** &mdash; `POST /api/auth/login` &rarr; `200 OK` (captures `authToken`)
+2. **Fetch Today Schedule** &mdash; `GET /api/records/today` &rarr; `200 OK` (generates dose rows and summary)
+3. **Mark Dose Taken** &mdash; `PATCH /api/records/:id/status` `{ "status": "Taken" }` &rarr; `200 OK` (sets `takenAt`)
+4. **Mark Dose Missed** &mdash; `PATCH /api/records/:id/status` `{ "status": "Missed" }` &rarr; `200 OK` (`takenAt` cleared)
+5. **Reset Dose to Pending** &mdash; `PATCH /api/records/:id/status` `{ "status": "Pending" }` &rarr; `200 OK`
+6. **Fetch Medication History (Unfiltered)** &mdash; `GET /api/records/history` &rarr; `200 OK`
+7. **Filter History by Date** &mdash; `GET /api/records/history?date=YYYY-MM-DD` &rarr; `200 OK`
+8. **Filter History by Status** &mdash; `GET /api/records/history?status=Taken` &rarr; `200 OK`
+9. **Reject Invalid Status** &mdash; `PATCH /api/records/:id/status` `{ "status": "Skipped" }` &rarr; `400 Bad Request`
 
 ---
 
@@ -224,13 +284,24 @@ An importable Postman collection is included at:
 - [x] Validated 24-hour reminder times (`HH:mm`) and date sequences (`endDate >= startDate`).
 - [x] Created `client/src/services/medicineService.js` with session expiration dispatch.
 - [x] Built interactive React Medicines page with Create/Edit modal dialogs, search filter, and delete confirmations.
-- [x] Verified zero database dependencies.
-- [x] Exported comprehensive Postman collection to `postman/MediTrack_Step3_Medicines.postman_collection.json`.
+- [x] Exported Postman collection: `postman/MediTrack_Step3_Medicines.postman_collection.json`.
+
+### ✅ Completed in Task 4 (Daily Tracking, Adherence & History)
+- [x] Initialized `server/data/medicationRecords.json` for dose log storage.
+- [x] Built automatic schedule generation engine: computes doses for active prescriptions on the current server date.
+- [x] Built deduplication logic ensuring doses for a given `(userId, medicineId, date, time)` are generated only once.
+- [x] Implemented status transition API (`PATCH /api/records/:id/status`) with automatic `takenAt` timestamp assignment.
+- [x] Built real-time daily progress adherence calculation (`adherenceRate`, `taken`, `missed`, `pending`).
+- [x] Implemented medication history API (`GET /api/records/history`) with multi-param filtering (`?date=...`, `?status=...`).
+- [x] Created `client/src/services/recordService.js` for API integration.
+- [x] Upgraded `Dashboard.jsx` with dynamic progress bars, status counters, and instant dose status toggle buttons.
+- [x] Upgraded `MedicationHistory.jsx` with date-picker and status-filter history query views.
+- [x] Exported comprehensive Postman collection: `postman/MediTrack_Step4_Tracking_History.postman_collection.json`.
+- [x] Preserved zero database dependency (strict JSON file storage).
 
 ### ⏳ Planned for Upcoming Tasks
-- [ ] Medication status tracking (Taken, Missed, Pending actions) (Step 4).
-- [ ] Daily progress adherence calculations (Step 4).
-- [ ] Intake history logs with date/status filtering (Step 4).
+- [ ] Health Vitals Tracking (blood pressure, heart rate, blood glucose, weight) (Step 5).
+- [ ] Automated browser/push notification alerts for upcoming dose times.
 
 ---
 

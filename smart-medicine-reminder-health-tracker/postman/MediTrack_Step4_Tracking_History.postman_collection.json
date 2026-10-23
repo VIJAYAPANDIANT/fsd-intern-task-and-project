@@ -1,0 +1,258 @@
+{
+  "info": {
+    "name": "MediTrack - Step 4 Tracking, Adherence & History",
+    "_postman_id": "a8c91d44-8842-4217-a068-154dfc2e9981",
+    "description": "Postman test collection for Smart Medicine Reminder & Health Tracker Step 4: Daily Tracking, Schedule Generation, Status Updates (Taken/Missed/Pending), Adherence Summary, and History Filtering.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "recordId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Auth - Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "if (jsonData.data && jsonData.data.token) {",
+              "    pm.collectionVariables.set(\"authToken\", jsonData.data.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+        "description": "Authenticates and stores token in authToken."
+      }
+    },
+    {
+      "name": "02. Get Today's Schedule & Summary (GET /api/records/today)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Contains summary object\", function () { pm.expect(jsonData.data.summary).to.be.an('object'); });",
+              "pm.test(\"Adherence rate is a number\", function () { pm.expect(jsonData.data.summary.adherenceRate).to.be.a('number'); });",
+              "if (jsonData.data.records && jsonData.data.records.length > 0) {",
+              "    pm.collectionVariables.set(\"recordId\", jsonData.data.records[0].id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/records/today", "host": ["{{baseUrl}}"], "path": ["api", "records", "today"] },
+        "description": "Retrieves today's doses, auto-generating pending records for active prescriptions."
+      }
+    },
+    {
+      "name": "03. Mark Dose as Taken (PATCH /api/records/:id/status)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Status is Taken\", function () { pm.expect(jsonData.data.status).to.eql('Taken'); });",
+              "pm.test(\"takenAt timestamp is populated\", function () { pm.expect(jsonData.data.takenAt).to.not.be.null; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Taken\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/records/{{recordId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "records", "{{recordId}}", "status"] },
+        "description": "Marks a scheduled dose as Taken and logs takenAt timestamp."
+      }
+    },
+    {
+      "name": "04. Mark Dose as Missed (PATCH /api/records/:id/status)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Status is Missed\", function () { pm.expect(jsonData.data.status).to.eql('Missed'); });",
+              "pm.test(\"takenAt is null\", function () { pm.expect(jsonData.data.takenAt).to.be.null; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Missed\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/records/{{recordId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "records", "{{recordId}}", "status"] },
+        "description": "Marks a dose as Missed."
+      }
+    },
+    {
+      "name": "05. Reset Dose to Pending (PATCH /api/records/:id/status)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Status is Pending\", function () { pm.expect(jsonData.data.status).to.eql('Pending'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Pending\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/records/{{recordId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "records", "{{recordId}}", "status"] },
+        "description": "Resets dose status back to Pending."
+      }
+    },
+    {
+      "name": "06. Get Medication History (GET /api/records/history)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Data is array\", function () { pm.expect(Array.isArray(jsonData.data)).to.be.true; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/records/history", "host": ["{{baseUrl}}"], "path": ["api", "records", "history"] },
+        "description": "Retrieves all historical medication intake records."
+      }
+    },
+    {
+      "name": "07. History Filtered by Status (GET /api/records/history?status=Taken)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"All returned items have status Taken\", function () {",
+              "    jsonData.data.forEach(r => pm.expect(r.status).to.eql('Taken'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/records/history?status=Taken", "host": ["{{baseUrl}}"], "path": ["api", "records", "history"], "query": [{ "key": "status", "value": "Taken" }] },
+        "description": "Filters history to only include doses marked as Taken."
+      }
+    },
+    {
+      "name": "08. Invalid Status Submission (Expects 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 400 Bad Request\", function () { pm.response.to.have.status(400); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"InvalidStatusXYZ\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/records/{{recordId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "records", "{{recordId}}", "status"] },
+        "description": "Rejects invalid status value."
+      }
+    },
+    {
+      "name": "09. Access Records Without Token (Expects 401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 401 Unauthorized\", function () { pm.response.to.have.status(401); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/records/today", "host": ["{{baseUrl}}"], "path": ["api", "records", "today"] },
+        "description": "Verifies that unauthenticated requests to tracking APIs are rejected."
+      }
+    }
+  ]
+}

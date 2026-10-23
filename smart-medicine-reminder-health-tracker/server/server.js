@@ -10,6 +10,7 @@ const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
 const healthRoutes = require('./routes/healthRoutes');
 const authRoutes = require('./routes/authRoutes');
 const medicineRoutes = require('./routes/medicineRoutes');
+const recordRoutes = require('./routes/recordRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -42,6 +43,11 @@ app.get('/', (req, res) => {
         create: 'POST /api/medicines',
         update: 'PUT /api/medicines/:id',
         delete: 'DELETE /api/medicines/:id'
+      },
+      records: {
+        todaySchedule: 'GET /api/records/today',
+        updateStatus: 'PATCH /api/records/:id/status',
+        history: 'GET /api/records/history'
       }
     }
   });
@@ -51,6 +57,7 @@ app.get('/', (req, res) => {
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/medicines', medicineRoutes);
+app.use('/api/records', recordRoutes);
 
 // Error Handling Middleware
 app.use(notFoundHandler);
@@ -62,6 +69,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🩺 Health check available at: http://localhost:${PORT}/api/health`);
   console.log(`🔐 Auth API available at: http://localhost:${PORT}/api/auth`);
   console.log(`💊 Medicine CRUD API available at: http://localhost:${PORT}/api/medicines`);
+  console.log(`📋 Tracking & Records API available at: http://localhost:${PORT}/api/records`);
 });
 
 module.exports = app;
