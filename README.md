@@ -41,14 +41,18 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## 💊 Project 2: Smart Medicine Reminder & Health Tracker
 
-The **Smart Medicine Reminder & Health Tracker** is a full-stack medication schedule and health metrics tracking application. It helps individuals and caregivers set dosage schedules, receive dose reminders, monitor daily adherence rates, and track vital health indicators.
+The **Smart Medicine Reminder & Health Tracker (MediTrack)** is a full-stack medication schedule and health metrics tracking application. It helps individuals and caregivers set dosage schedules, receive dose reminders, monitor daily adherence rates, and track vital health indicators with strict cross-user privacy.
 
 ### Key Highlights
-- **Full-Stack REST Architecture**: Decoupled React frontend (Vite) and Node.js/Express backend communicating over REST APIs.
-- **File-Based JSON Storage**: Custom, persistent JSON file storage in `server/data/` adhering to assignment requirements with zero external database dependencies.
-- **Dose Adherence Monitoring**: Designed to track medication statuses across `Taken`, `Missed`, and `Pending` states with adherence progress percentages.
-- **Responsive Healthcare UI**: Styled with Tailwind CSS, including reusable `Card`, `StatusBadge`, and responsive navigation components.
-- **Health Check Endpoint**: Backend `GET /api/health` verified with live connectivity polling from the frontend.
+- **Full-Stack REST Architecture**: Decoupled React 18 frontend (Vite + Tailwind CSS) and Node.js/Express backend communicating over REST APIs.
+- **JWT Authentication & Password Hashing**: Secure user registration and login with `bcryptjs` password hashing (salt rounds: 10) and signed JWTs. Protected client routing via `ProtectedRoute`.
+- **Prescription CRUD Lifecycle**: Full management of medication records (name, dosage, daily frequency, multiple 24-hr reminder times, start/end dates, and instructions) with confirmation modal dialogs on deletion.
+- **Automated Daily Dose Engine**: Server-side schedule generator that automatically computes today's scheduled doses from active user prescriptions with idempotency and deduplication guards.
+- **Real-Time Adherence Monitoring**: Instant recalculation of daily adherence compliance ($0-100\%$), visual progress bar, status badges, and counters across `Taken`, `Missed`, and `Pending` states.
+- **Multi-Criteria Medication History**: Interactive log querying with date range filters (`From Date` and `To Date`), medicine selector dropdown, and status filters, with newest doses displayed first.
+- **File-Based JSON Storage Engine**: Custom, persistent JSON file storage in `server/data/` utilizing atomic rename writes (`.tmp` + `rename`), Promise write queues, and corruption safeguards—adhering strictly to assignment requirements with zero external database dependencies.
+- **Centralized API Client Architecture**: Unified frontend API client (`client/src/services/apiClient.js`) that automatically resolves environment variables, injects Bearer JWT headers, handles network failures, and catches 401 session expirations.
+- **Postman API Test Suite**: Comprehensive collections in `postman/` covering all 7 endpoint groups and 35 automated test scenarios.
 
 ### Quick Start (Smart Medicine Reminder & Health Tracker)
 
@@ -68,6 +72,10 @@ npm install
 npm run dev
 ```
 - Client runs at: `http://localhost:5173`
+
+#### 3. Postman API Testing
+Import the collection from:  
+[`smart-medicine-reminder-health-tracker/postman/MediTrack_Full_Integration_Step5.postman_collection.json`](./smart-medicine-reminder-health-tracker/postman/MediTrack_Full_Integration_Step5.postman_collection.json)
 
 ---
 
