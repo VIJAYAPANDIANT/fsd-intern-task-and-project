@@ -117,6 +117,15 @@ export default function App() {
     setActivePage('login');
   };
 
+  // Listen for global auth expiration events from API client
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      handleLogout();
+    };
+    window.addEventListener('meditrack:auth-expired', handleAuthExpired);
+    return () => window.removeEventListener('meditrack:auth-expired', handleAuthExpired);
+  }, []);
+
   const isAuthenticated = Boolean(token && user);
 
   return (

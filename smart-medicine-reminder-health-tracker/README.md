@@ -12,11 +12,10 @@ This project is developed as part of the Full Stack Web Development (FSD) Intern
 
 - **User Authentication**: Secure user registration and login using JWT (JSON Web Tokens) and bcryptjs password hashing.
 - **Protected Routing**: Guard sensitive routes (`Dashboard`, `Medicines`, `Medication History`) from unauthenticated access.
-- **Medication Scheduling**: Allow users to configure medicine names, dosages, frequencies, and scheduled intake times (Step 3).
-- **Real-Time Reminders & Status Tracking**: Categorize daily doses across `Taken`, `Missed`, and `Pending` states.
-- **Daily Adherence Tracking**: Provide clear visual feedback on daily dose compliance and historical intake.
-- **Secure File-Based Storage**: Manage data safely using structured JSON file storage with atomic writes and corruption safeguards.
-- **Separation of Concerns**: Deliver a clean RESTful architecture with a React frontend and Node.js/Express backend.
+- **Medication Scheduling (Step 3)**: Complete CRUD capability for prescriptions (name, dosage, frequency, 24-hr reminder times, start/end dates, instructions).
+- **Cross-User Data Isolation**: Strict user-specific authorization ensuring no user can read, modify, or delete another's records.
+- **Secure File-Based Storage**: Safe JSON persistence using atomic writes (`.tmp` + `fs.rename`), async write queuing, and corruption safeguards without external database dependencies.
+- **Separation of Concerns**: Clean modular MVC / service architecture on Express with a decoupled React Vite frontend.
 
 ---
 
@@ -28,18 +27,16 @@ This project is developed as part of the Full Stack Web Development (FSD) Intern
 - **Language**: JavaScript (ES6+)
 - **Styling**: Tailwind CSS 3, PostCSS, Autoprefixer
 - **Icons**: Lucide React
-- **API Client**: Native `fetch` API
-- **Session Persistence**: Browser `sessionStorage` (with XSS considerations documented)
+- **API Client**: Native `fetch` API (`client/src/services/medicineService.js`)
+- **Session Persistence**: Browser `sessionStorage`
 
 ### Backend
 - **Runtime**: Node.js (v20+)
 - **Framework**: Express.js 4
-- **Authentication**: `jsonwebtoken` (JWT)
+- **Authentication**: `jsonwebtoken` (JWT with Bearer authentication)
 - **Password Hashing**: `bcryptjs` (salt rounds: 10)
-- **Architecture**: Modular MVC / Service-oriented REST API
-- **Data Persistence**: JSON file storage (`server/data/`) — *No external database (MongoDB/SQL) per specification*
-- **Environment Management**: `dotenv`
-- **CORS Handling**: `cors` middleware
+- **Architecture**: Modular Controller / Service-oriented REST API
+- **Data Persistence**: JSON file storage (`server/data/medicines.json`, `server/data/users.json`) — *No external database (MongoDB/SQL) per specification*
 - **Dev Tooling**: `nodemon` for auto-reloading
 
 ---
@@ -51,8 +48,11 @@ smart-medicine-reminder-health-tracker/
 ├── .gitignore
 ├── README.md
 ├── postman/
-│   └── MediTrack_Step2_Auth.postman_collection.json
+│   ├── MediTrack_Step2_Auth.postman_collection.json
+│   └── MediTrack_Step3_Medicines.postman_collection.json
 ├── client/
+│   ├── .env
+│   ├── .env.example
 │   ├── index.html
 │   ├── package.json
 │   ├── postcss.config.js
@@ -69,12 +69,14 @@ smart-medicine-reminder-health-tracker/
 │       │   ├── Navbar.jsx
 │       │   ├── ProtectedRoute.jsx
 │       │   └── StatusBadge.jsx
-│       └── pages/
-│           ├── Dashboard.jsx
-│           ├── Login.jsx
-│           ├── MedicationHistory.jsx
-│           ├── Medicines.jsx
-│           └── Register.jsx
+│       ├── pages/
+│       │   ├── Dashboard.jsx
+│       │   ├── Login.jsx
+│       │   ├── MedicationHistory.jsx
+│       │   ├── Medicines.jsx
+│       │   └── Register.jsx
+│       └── services/
+│           └── medicineService.js
 └── server/
     ├── .env
     ├── .env.example
@@ -82,7 +84,8 @@ smart-medicine-reminder-health-tracker/
     ├── server.js
     ├── controllers/
     │   ├── authController.js
-    │   └── healthController.js
+    │   ├── healthController.js
+    │   └── medicineController.js
     ├── data/
     │   ├── README.md
     │   ├── history.json
@@ -93,8 +96,10 @@ smart-medicine-reminder-health-tracker/
     │   └── errorHandler.js
     ├── routes/
     │   ├── authRoutes.js
-    │   └── healthRoutes.js
+    │   ├── healthRoutes.js
+    │   └── medicineRoutes.js
     ├── services/
+    │   ├── medicineService.js
     │   └── userService.js
     └── utils/
         └── jsonStorage.js
@@ -102,79 +107,51 @@ smart-medicine-reminder-health-tracker/
 
 ---
 
-## 🔐 Authentication & Security Architecture (Step 2)
+## 💊 Medicine CRUD REST APIs (Step 3)
 
-### 1. User Registration (`POST /api/auth/register`)
-- Accepts `name`, `email`, `password`.
-- Validates required fields, email format regex, and minimum password length (≥ 6 characters).
-- Checks for duplicate emails (case-insensitive) in `users.json` and rejects with `HTTP 409 Conflict`.
-- Hashes passwords using `bcryptjs.hash(password, 10)` before persisting.
-- Generates a unique user ID (`usr_<timestamp>_<randomHex>`).
-- Persists to `server/data/users.json` via atomic writes.
-- Returns `HTTP 201 Created` with a sanitized user object (omits `passwordHash`) and a signed JWT token.
+All medicine routes are protected and require a valid Bearer JWT:
+`Authorization: Bearer <token>`
 
-### 2. User Login (`POST /api/auth/login`)
-- Accepts `email`, `password`.
-- Finds the user in `users.json`.
-- Compares passwords using `bcryptjs.compare()`.
-- Returns a generic `401 Unauthorized` message (`Invalid email or password`) for nonexistent users or mismatched passwords (prevents user enumeration).
-- Signs a JWT with payload `{ id: user.id, email: user.email }` using `process.env.JWT_SECRET` and expiration (`JWT_EXPIRES_IN`).
-- Returns `HTTP 200 OK` with sanitized user information and the JWT token.
+| Method | Endpoint | Description | Status Codes |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/medicines` | Returns all medicines owned by the authenticated user. Supports optional query filters: `?name=...` and `?frequency=...` | `200`, `401` |
+| **GET** | `/api/medicines/:id` | Returns a single medicine by ID. Enforces strict user ownership. | `200`, `401`, `404` |
+| **POST** | `/api/medicines` | Creates a new prescription schedule for the authenticated user. | `201`, `400`, `401` |
+| **PUT** | `/api/medicines/:id` | Updates an existing prescription. Enforces user ownership and validates values. | `200`, `400`, `401`, `404` |
+| **DELETE** | `/api/medicines/:id` | Deletes a prescription schedule. Enforces user ownership. | `200`, `401`, `404` |
 
-### 3. JWT Authentication Middleware (`server/middleware/authMiddleware.js`)
-- Inspects the `Authorization` header for `Bearer <token>`.
-- Verifies signature and token expiry using `jwt.verify()`.
-- Retrieves the user record by ID from storage to confirm the account exists.
-- Attaches the sanitized user to `req.user` and ID to `req.userId`.
-- Rejects missing, malformed, or expired tokens with `HTTP 401 Unauthorized`.
-- **Zero Frontend Trust**: The authenticated user identity is derived strictly from the verified JWT payload, never from unverified request parameters.
+### Medicine Data Model (`medicines.json`)
+```json
+{
+  "id": "med_1792775417787_6d8d71f8",
+  "userId": "usr_alice_123",
+  "name": "Metformin Hydrochloride",
+  "dosage": "500 mg",
+  "frequency": "Twice daily",
+  "reminderTimes": ["08:00", "20:00"],
+  "startDate": "2026-10-23",
+  "endDate": "2026-11-23",
+  "instructions": "Take with breakfast and dinner",
+  "createdAt": "2026-10-23T17:10:17.787Z",
+  "updatedAt": "2026-10-23T17:10:17.787Z"
+}
+```
 
-### 4. Protected User Profile (`GET /api/auth/me`)
-- Secured behind `authMiddleware`.
-- Returns the authenticated user's profile (`id`, `name`, `email`, `createdAt`).
-- Guarantees password hashes are never exposed.
-
-### 5. Frontend Session & Protected Routes
-- **Session Persistence**: JWT stored in `sessionStorage` for session lifetime.
-- **XSS & Browser Storage Disclosure**: In this college prototype, `sessionStorage` is used for client-side state. For enterprise production systems, `httpOnly`, `secure`, `SameSite=Strict` cookies are recommended to prevent client-side JavaScript access (XSS attacks). Passwords are never stored on the client.
-- **Protected Views**: `Dashboard`, `Medicines`, and `Medication History` are wrapped in `<ProtectedRoute />`.
-- **Session Validation**: On page load or reload, `App.jsx` validates the stored token against `GET /api/auth/me`. Expired or invalid tokens are automatically purged and redirected to the login view.
-- **Logout**: Clears `sessionStorage`, resets React user state, and immediately routes to the login page.
+### Strict Ownership & Security Rules
+- **Derived Identity**: The backend derives `userId` exclusively from the verified JWT payload (`req.userId`), never from client request bodies or query parameters.
+- **Cross-User Isolation**: A user attempting to read, edit, or delete another user's medicine receives `HTTP 404 Not Found` (to avoid confirming resource existence to unauthorized actors).
+- **Input Validation**:
+  - `reminderTimes`: Must be an array of valid 24-hour times matching `/^([01]\d|2[0-3]):([0-5]\d)$/` (e.g. `08:00`, `20:30`).
+  - Dates: `startDate` and optional `endDate` must match `YYYY-MM-DD`. `endDate` must not precede `startDate`.
 
 ---
 
-## 📋 Prerequisites
+## 🗄️ JSON Persistence & Concurrency
 
-Ensure the following tools are installed on your machine before running the project:
-- **Node.js**: `v18.0.0` or later (tested on `v24.13.0`)
-- **npm**: `v9.0.0` or later (tested on `11.6.2`)
-- **Git**
-- Modern Web Browser (Chrome, Firefox, Edge, Safari)
-- **Postman** (optional, for API testing)
-
----
-
-## 🚀 Installation Instructions
-
-### 1. Repository Setup
-Navigate to the project directory:
-```bash
-cd smart-medicine-reminder-health-tracker
-```
-
-### 2. Backend Dependencies
-Navigate to the `server/` directory and install required npm packages:
-```bash
-cd server
-npm install
-```
-
-### 3. Frontend Dependencies
-Navigate to the `client/` directory and install required npm packages:
-```bash
-cd ../client
-npm install
-```
+- **No Database**: Prescriptions are persisted in [`server/data/medicines.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/server/data/medicines.json).
+- **Atomic File Writes**: The utility writes data to a temporary file (`.medicines.json.tmp-...`) and then executes an atomic rename (`fs.rename`). This prevents corrupt or truncated files if a process crashes mid-write.
+- **In-Memory Write Queue**: File write operations are serialized using promise chains in [`server/utils/jsonStorage.js`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/server/utils/jsonStorage.js) to avoid race conditions.
+- **Architecture Limitation Note**: File-based JSON storage is ideal for this single-node internship project and local testing. In enterprise multi-instance or clustered production environments, an ACID-compliant database with row/document locking would be necessary.
 
 ---
 
@@ -190,6 +167,7 @@ npm run dev
 - **Backend URL**: `http://localhost:5000`
 - **Health Check Endpoint**: `http://localhost:5000/api/health`
 - **Auth Endpoint**: `http://localhost:5000/api/auth`
+- **Medicines API**: `http://localhost:5000/api/medicines`
 
 ### Terminal 2: Frontend Client (Vite + React)
 ```bash
@@ -203,18 +181,20 @@ npm run dev
 ## 📮 Postman API Testing Guide
 
 An importable Postman collection is included at:  
-[`postman/MediTrack_Step2_Auth.postman_collection.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/MediTrack_Step2_Auth.postman_collection.json)
+[`postman/MediTrack_Step3_Medicines.postman_collection.json`](file:///c:/FSD%20Intern/smart-medicine-reminder-health-tracker/postman/MediTrack_Step3_Medicines.postman_collection.json)
 
 ### Tested Scenarios:
-1. **Health Check** &mdash; `GET http://localhost:5000/api/health` &rarr; `200 OK`
-2. **Register User (Valid)** &mdash; `POST /api/auth/register` &rarr; `201 Created`
-3. **Register Duplicate Email** &mdash; `POST /api/auth/register` &rarr; `409 Conflict`
-4. **Register Invalid Input (Short Password)** &mdash; `POST /api/auth/register` &rarr; `400 Bad Request`
-5. **Login (Valid Credentials)** &mdash; `POST /api/auth/login` &rarr; `200 OK` (returns JWT)
-6. **Login (Invalid Credentials)** &mdash; `POST /api/auth/login` &rarr; `401 Unauthorized`
-7. **Access Protected Profile (With Token)** &mdash; `GET /api/auth/me` with `Authorization: Bearer <token>` &rarr; `200 OK`
-8. **Access Protected Profile (Without Token)** &mdash; `GET /api/auth/me` &rarr; `401 Unauthorized`
-9. **Access Protected Profile (Invalid Token)** &mdash; `GET /api/auth/me` with `Authorization: Bearer bad_token` &rarr; `401 Unauthorized`
+1. **Login User A** &mdash; `POST /api/auth/login` &rarr; `200 OK` (captures `authToken`)
+2. **Create Medicine** &mdash; `POST /api/medicines` &rarr; `201 Created` (captures `medicineId`)
+3. **List Medicines** &mdash; `GET /api/medicines` &rarr; `200 OK` (returns array of User A's medicines)
+4. **Get One Medicine** &mdash; `GET /api/medicines/:id` &rarr; `200 OK`
+5. **Update Medicine** &mdash; `PUT /api/medicines/:id` &rarr; `200 OK` (updates dosage & notes)
+6. **Request Without Token** &mdash; `GET /api/medicines` &rarr; `401 Unauthorized`
+7. **Request Nonexistent Medicine** &mdash; `GET /api/medicines/med_nonexistent` &rarr; `404 Not Found`
+8. **Cross-User Isolation** &mdash; User B requests User A's medicine &rarr; `404 Not Found`
+9. **Invalid Reminder Times** &mdash; `POST /api/medicines` with `["25:99"]` &rarr; `400 Bad Request`
+10. **Invalid Date Order** &mdash; `POST /api/medicines` with `endDate < startDate` &rarr; `400 Bad Request`
+11. **Delete Medicine** &mdash; `DELETE /api/medicines/:id` &rarr; `200 OK`
 
 ---
 
@@ -234,18 +214,23 @@ An importable Postman collection is included at:
 - [x] User Login API (`POST /api/auth/login`) with credential comparison and signed JWT generation.
 - [x] JWT Authentication Middleware (`server/middleware/authMiddleware.js`) with Bearer token verification.
 - [x] Protected User Profile API (`GET /api/auth/me`) returning sanitized user profiles.
-- [x] Safe JSON storage with atomic temp-file writes and corruption prevention (`server/utils/jsonStorage.js`).
-- [x] Frontend Register page with controlled inputs, error validation, and auto-authentication.
-- [x] Frontend Login page with `sessionStorage` token caching and error handling.
-- [x] Protected route component (`ProtectedRoute.jsx`) guarding Dashboard, Medicines, and Medication History.
-- [x] Session restoration and token verification on startup.
-- [x] Logout functionality clearing tokens and resetting user state.
-- [x] Complete Postman test collection exported to `postman/`.
+- [x] Frontend Login & Register pages with session management and route guards (`ProtectedRoute.jsx`).
+
+### ✅ Completed in Task 3 (Medicine CRUD APIs & UI)
+- [x] Initialized `server/data/medicines.json` with strict schema validation.
+- [x] Created `server/services/medicineService.js` and `server/controllers/medicineController.js`.
+- [x] Implemented 5 REST endpoints: `GET /api/medicines`, `GET /:id`, `POST /`, `PUT /:id`, `DELETE /:id`.
+- [x] Enforced strict user ownership isolation (User B cannot access or modify User A's medicines).
+- [x] Validated 24-hour reminder times (`HH:mm`) and date sequences (`endDate >= startDate`).
+- [x] Created `client/src/services/medicineService.js` with session expiration dispatch.
+- [x] Built interactive React Medicines page with Create/Edit modal dialogs, search filter, and delete confirmations.
+- [x] Verified zero database dependencies.
+- [x] Exported comprehensive Postman collection to `postman/MediTrack_Step3_Medicines.postman_collection.json`.
 
 ### ⏳ Planned for Upcoming Tasks
-- [ ] Medicine Schedule CRUD APIs & interactive forms (Step 3).
-- [ ] Dose tracking actions (Mark as Taken / Missed / Pending).
-- [ ] History log filtering and adherence rate analytics.
+- [ ] Medication status tracking (Taken, Missed, Pending actions) (Step 4).
+- [ ] Daily progress adherence calculations (Step 4).
+- [ ] Intake history logs with date/status filtering (Step 4).
 
 ---
 

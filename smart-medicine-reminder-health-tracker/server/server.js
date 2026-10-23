@@ -9,6 +9,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
 const healthRoutes = require('./routes/healthRoutes');
 const authRoutes = require('./routes/authRoutes');
+const medicineRoutes = require('./routes/medicineRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,7 +35,14 @@ app.get('/', (req, res) => {
       healthCheck: 'GET /api/health',
       authRegister: 'POST /api/auth/register',
       authLogin: 'POST /api/auth/login',
-      authMe: 'GET /api/auth/me'
+      authMe: 'GET /api/auth/me',
+      medicines: {
+        list: 'GET /api/medicines',
+        getOne: 'GET /api/medicines/:id',
+        create: 'POST /api/medicines',
+        update: 'PUT /api/medicines/:id',
+        delete: 'DELETE /api/medicines/:id'
+      }
     }
   });
 });
@@ -42,16 +50,18 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/medicines', medicineRoutes);
 
 // Error Handling Middleware
 app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Medicine Reminder Backend Server running on http://localhost:${PORT}`);
   console.log(`🩺 Health check available at: http://localhost:${PORT}/api/health`);
   console.log(`🔐 Auth API available at: http://localhost:${PORT}/api/auth`);
+  console.log(`💊 Medicine CRUD API available at: http://localhost:${PORT}/api/medicines`);
 });
 
 module.exports = app;

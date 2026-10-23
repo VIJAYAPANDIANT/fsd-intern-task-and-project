@@ -1,0 +1,319 @@
+{
+  "info": {
+    "name": "MediTrack - Step 3 Medicine CRUD APIs",
+    "_postman_id": "f5a7e6b1-4d32-4988-bb71-8973b0643211",
+    "description": "Comprehensive Postman test collection for Smart Medicine Reminder & Health Tracker Step 3: Medicine CRUD REST APIs, Input Validation, and Cross-User Data Isolation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicineId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otherUserToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Auth - Login as User A",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "if (jsonData.data && jsonData.data.token) {",
+              "    pm.collectionVariables.set(\"authToken\", jsonData.data.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+        "description": "Authenticates User A and stores token in collection variable authToken."
+      }
+    },
+    {
+      "name": "02. Create Medicine - Valid (POST /api/medicines)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status code is 201 Created\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Response success is true\", function () { pm.expect(jsonData.success).to.eql(true); });",
+              "pm.test(\"Has generated medicine ID\", function () { pm.expect(jsonData.data.id).to.be.a('string'); });",
+              "if (jsonData.data && jsonData.data.id) {",
+              "    pm.collectionVariables.set(\"medicineId\", jsonData.data.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Metformin Hydrochloride\",\n  \"dosage\": \"500 mg\",\n  \"frequency\": \"Twice daily\",\n  \"reminderTimes\": [\"08:00\", \"20:00\"],\n  \"startDate\": \"2026-10-23\",\n  \"endDate\": \"2026-11-23\",\n  \"instructions\": \"Take with food\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/medicines", "host": ["{{baseUrl}}"], "path": ["api", "medicines"] },
+        "description": "Creates a new medicine record for User A."
+      }
+    },
+    {
+      "name": "03. List Medicines with Valid JWT (GET /api/medicines)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status code is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Data is an array\", function () { pm.expect(Array.isArray(jsonData.data)).to.be.true; });",
+              "pm.test(\"Contains newly created medicine\", function () {",
+              "    var found = jsonData.data.some(m => m.id === pm.collectionVariables.get(\"medicineId\"));",
+              "    pm.expect(found).to.be.true;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/medicines", "host": ["{{baseUrl}}"], "path": ["api", "medicines"] },
+        "description": "Retrieves all medicine records belonging to User A."
+      }
+    },
+    {
+      "name": "04. Get One Medicine by ID (GET /api/medicines/:id)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status code is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Returns the requested medicine\", function () {",
+              "    pm.expect(jsonData.data.id).to.eql(pm.collectionVariables.get(\"medicineId\"));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/medicines/{{medicineId}}", "host": ["{{baseUrl}}"], "path": ["api", "medicines", "{{medicineId}}"] },
+        "description": "Retrieves one medicine by ID owned by User A."
+      }
+    },
+    {
+      "name": "05. Update Medicine (PUT /api/medicines/:id)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status code is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Updated dosage value\", function () { pm.expect(jsonData.data.dosage).to.eql(\"850 mg\"); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dosage\": \"850 mg\",\n  \"instructions\": \"Take after heavy meals\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/medicines/{{medicineId}}", "host": ["{{baseUrl}}"], "path": ["api", "medicines", "{{medicineId}}"] },
+        "description": "Updates medicine dosage and instructions."
+      }
+    },
+    {
+      "name": "06. Request Medicines Without Token (Expects 401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401 Unauthorized\", function () { pm.response.to.have.status(401); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Success is false\", function () { pm.expect(jsonData.success).to.be.false; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/medicines", "host": ["{{baseUrl}}"], "path": ["api", "medicines"] },
+        "description": "Ensures unauthenticated access to medicine APIs is rejected."
+      }
+    },
+    {
+      "name": "07. Request Nonexistent Medicine (Expects 404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () { pm.response.to.have.status(404); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/medicines/med_nonexistent_9999", "host": ["{{baseUrl}}"], "path": ["api", "medicines", "med_nonexistent_9999"] },
+        "description": "Verifies 404 is returned when requesting a medicine ID that does not exist."
+      }
+    },
+    {
+      "name": "08. Cross-User Isolation - Try to Access Another User's Medicine (Expects 404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () { pm.response.to.have.status(404); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Error message is Medicine not found\", function () {",
+              "    pm.expect(jsonData.message).to.eql(\"Medicine not found\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{otherUserToken}}", "type": "string" }] },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/medicines/{{medicineId}}", "host": ["{{baseUrl}}"], "path": ["api", "medicines", "{{medicineId}}"] },
+        "description": "Confirms User B cannot view User A's medicine by ID."
+      }
+    },
+    {
+      "name": "09. Validation - Submit Invalid Reminder Times (Expects 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () { pm.response.to.have.status(400); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Validation error mentions reminder time\", function () {",
+              "    pm.expect(jsonData.message).to.include(\"Invalid reminder time\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Invalid Time Test\",\n  \"dosage\": \"1 tablet\",\n  \"frequency\": \"Daily\",\n  \"reminderTimes\": [\"25:99\"],\n  \"startDate\": \"2026-10-23\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/medicines", "host": ["{{baseUrl}}"], "path": ["api", "medicines"] },
+        "description": "Verifies that invalid 24-hr reminder times are rejected with 400."
+      }
+    },
+    {
+      "name": "10. Validation - Submit End Date Earlier Than Start Date (Expects 400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400 Bad Request\", function () { pm.response.to.have.status(400); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Error mentions date order\", function () {",
+              "    pm.expect(jsonData.message).to.include(\"End date cannot be earlier than start date\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Invalid Date Order Test\",\n  \"dosage\": \"1 tablet\",\n  \"frequency\": \"Daily\",\n  \"reminderTimes\": [\"08:00\"],\n  \"startDate\": \"2026-10-25\",\n  \"endDate\": \"2026-10-20\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/medicines", "host": ["{{baseUrl}}"], "path": ["api", "medicines"] },
+        "description": "Verifies that endDate < startDate is rejected with 400."
+      }
+    },
+    {
+      "name": "11. Delete Medicine (DELETE /api/medicines/:id)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Status code is 200 OK\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Delete success message\", function () { pm.expect(jsonData.success).to.be.true; });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{authToken}}", "type": "string" }] },
+        "method": "DELETE",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/medicines/{{medicineId}}", "host": ["{{baseUrl}}"], "path": ["api", "medicines", "{{medicineId}}"] },
+        "description": "Deletes the created medicine record for User A."
+      }
+    }
+  ]
+}

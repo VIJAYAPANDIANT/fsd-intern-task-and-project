@@ -26,7 +26,7 @@ export default function Dashboard({ setActivePage, backendHealth, user }) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-semibold tracking-wide uppercase mb-2">
-              Step 2 &bull; Authenticated Session
+              Step 3 &bull; Medicine Schedules Active
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               Good day, {user?.name || 'MediTrack User'}!
