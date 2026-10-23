@@ -1,57 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-
-/**
- * Retrieves the stored JWT from sessionStorage.
- */
-const getAuthToken = () => {
-  return sessionStorage.getItem('meditrack_token');
-};
-
-/**
- * Common fetch wrapper that injects Authorization header,
- * handles HTTP status codes, and emits session expiration events on 401.
- */
-const fetchWithAuth = async (endpoint, options = {}) => {
-  const token = getAuthToken();
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {})
-  };
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  let response;
-  try {
-    response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers
-    });
-  } catch (netErr) {
-    throw new Error('Network error: Unable to communicate with backend server. Please verify the API is running.');
-  }
-
-  // Handle unauthorized / session expiration
-  if (response.status === 401) {
-    sessionStorage.removeItem('meditrack_token');
-    window.dispatchEvent(new CustomEvent('meditrack:auth-expired'));
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Session expired or unauthorized. Please log in again.');
-  }
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.message || `Request failed with status ${response.status}`);
-  }
-
-  return data;
-};
+import { fetchApi } from './apiClient';
 
 /**
  * Retrieves all medicines for the authenticated user, with optional filters.
- * @param {object} filters - { name?: string, frequency?: string }
+ * @param {object} [filters={}] - { name?: string, frequency?: string }
  */
 export const getMedicines = async (filters = {}) => {
   const queryParams = new URLSearchParams();
@@ -63,7 +14,7 @@ export const getMedicines = async (filters = {}) => {
   }
 
   const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
-  const result = await fetchWithAuth(`/medicines${queryString}`, { method: 'GET' });
+  const result = await fetchApi(`/medicines${queryString}`, { method: 'GET' });
   return result.data;
 };
 
@@ -72,7 +23,7 @@ export const getMedicines = async (filters = {}) => {
  * @param {string} id - Medicine ID
  */
 export const getMedicineById = async (id) => {
-  const result = await fetchWithAuth(`/medicines/${encodeURIComponent(id)}`, { method: 'GET' });
+  const result = await fetchApi(`/medicines/${encodeURIComponent(id)}`, { method: 'GET' });
   return result.data;
 };
 
@@ -81,7 +32,7 @@ export const getMedicineById = async (id) => {
  * @param {object} medicineData - { name, dosage, frequency, reminderTimes, startDate, endDate?, instructions? }
  */
 export const createMedicine = async (medicineData) => {
-  const result = await fetchWithAuth('/medicines', {
+  const result = await fetchApi('/medicines', {
     method: 'POST',
     body: JSON.stringify(medicineData)
   });
@@ -94,7 +45,7 @@ export const createMedicine = async (medicineData) => {
  * @param {object} medicineData - Fields to update
  */
 export const updateMedicine = async (id, medicineData) => {
-  const result = await fetchWithAuth(`/medicines/${encodeURIComponent(id)}`, {
+  const result = await fetchApi(`/medicines/${encodeURIComponent(id)}`, {
     method: 'PUT',
     body: JSON.stringify(medicineData)
   });
@@ -106,7 +57,7 @@ export const updateMedicine = async (id, medicineData) => {
  * @param {string} id - Medicine ID
  */
 export const deleteMedicine = async (id) => {
-  const result = await fetchWithAuth(`/medicines/${encodeURIComponent(id)}`, {
+  const result = await fetchApi(`/medicines/${encodeURIComponent(id)}`, {
     method: 'DELETE'
   });
   return result.data;

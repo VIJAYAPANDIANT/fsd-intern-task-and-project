@@ -95,12 +95,50 @@ const changeRecordStatus = async (req, res, next) => {
 
 /**
  * GET /api/records/history
- * Retrieves historical medication intake logs with optional filtering by date, status, or medicine.
+ * Retrieves historical medication intake logs with optional filtering by date, date range, status, or medicine.
  */
 const getHistory = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { date, startDate, endDate, status, medicineId } = req.query;
+
+    if (date && !isValidDateFormat(date)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date parameter. Must be in YYYY-MM-DD format.'
+      });
+    }
+
+    if (startDate && !isValidDateFormat(startDate)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid startDate parameter. Must be in YYYY-MM-DD format.'
+      });
+    }
+
+    if (endDate && !isValidDateFormat(endDate)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid endDate parameter. Must be in YYYY-MM-DD format.'
+      });
+    }
+
+    if (startDate && endDate && startDate.trim() > endDate.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'startDate cannot be later than endDate.'
+      });
+    }
+
+    if (status && status !== 'All') {
+      const validStatuses = ['pending', 'taken', 'missed'];
+      if (!validStatuses.includes(status.trim().toLowerCase())) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid status filter "${status}". Allowed values: Pending, Taken, Missed, or All.`
+        });
+      }
+    }
 
     const records = await getHistoryRecords(userId, {
       date,

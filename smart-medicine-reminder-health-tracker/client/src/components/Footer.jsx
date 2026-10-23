@@ -9,7 +9,7 @@ export default function Footer() {
           Smart Medicine Reminder & Health Tracker &bull; Built with{' '}
           <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500 inline" /> for FSD Internship
         </p>
-        <p>Maintained by Vijayapandian T &bull; Task 1 Project Setup</p>
+        <p>Maintained by Vijayapandian T &bull; Full Stack Web Development Internship</p>
       </div>
     </footer>
   );

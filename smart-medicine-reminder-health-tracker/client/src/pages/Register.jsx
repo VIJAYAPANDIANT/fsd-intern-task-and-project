@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Card from '../components/Card';
+import { registerUser } from '../services/authService';
 import { UserPlus, User, Mail, Lock, ShieldCheck, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
 
 export default function Register({ onSwitchToLogin, onRegisterSuccess }) {
@@ -66,36 +67,22 @@ export default function Register({ onSwitchToLogin, onRegisterSuccess }) {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          password: formData.password
-        })
+      const data = await registerUser({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setApiError(data.message || 'Registration failed. Please check your inputs.');
-        setIsSubmitting(false);
-        return;
-      }
 
       setSuccessMessage('Registration successful! Logging you in...');
 
       // Notify parent app of successful registration & token
       setTimeout(() => {
-        if (onRegisterSuccess && data.data) {
-          onRegisterSuccess(data.data.token, data.data.user);
+        if (onRegisterSuccess && data) {
+          onRegisterSuccess(data.token, data.user);
         }
       }, 700);
     } catch (err) {
-      setApiError('Unable to connect to the backend server. Please verify the API is running.');
+      setApiError(err.message || 'Unable to connect to the backend server. Please verify the API is running.');
       setIsSubmitting(false);
     }
   };

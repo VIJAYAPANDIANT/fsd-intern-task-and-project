@@ -7,9 +7,11 @@ import Medicines from './pages/Medicines';
 import MedicationHistory from './pages/MedicationHistory';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { checkHealth, getMe } from './services/authService';
+import { getAuthToken, setAuthToken, clearAuthToken } from './services/apiClient';
 
 export default function App() {
-  const initialToken = sessionStorage.getItem('meditrack_token');
+  const initialToken = getAuthToken();
   const [token, setToken] = useState(initialToken);
   const [user, setUser] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(Boolean(initialToken));
@@ -21,14 +23,9 @@ export default function App() {
   useEffect(() => {
     const checkApiHealth = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/health');
-        if (response.ok) {
-          const data = await response.json();
-          setBackendHealth(data);
-          setBackendStatus('online');
-        } else {
-          setBackendStatus('error');
-        }
+        const data = await checkHealth();
+        setBackendHealth(data);
+        setBackendStatus('online');
       } catch (err) {
         setBackendStatus('offline');
       }
@@ -42,7 +39,7 @@ export default function App() {
   // Validate existing session token on application startup or restoration
   useEffect(() => {
     const validateSession = async () => {
-      const storedToken = sessionStorage.getItem('meditrack_token');
+      const storedToken = getAuthToken();
       if (!storedToken) {
         setIsAuthLoading(false);
         if (['dashboard', 'medicines', 'history'].includes(activePage)) {
@@ -52,28 +49,20 @@ export default function App() {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/auth/me', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${storedToken}`
-          }
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          setUser(result.data.user);
+        const data = await getMe();
+        if (data?.user) {
+          setUser(data.user);
           setToken(storedToken);
         } else {
-          // Token is expired, invalid, or user was deleted
-          sessionStorage.removeItem('meditrack_token');
+          clearAuthToken();
           setToken(null);
           setUser(null);
           setActivePage('login');
         }
       } catch (err) {
-        // If server is unreachable during startup validation
+        // If server is unreachable or token is invalid/expired
         console.warn('Unable to validate token with server:', err.message);
-        sessionStorage.removeItem('meditrack_token');
+        clearAuthToken();
         setToken(null);
         setUser(null);
         setActivePage('login');
@@ -97,21 +86,21 @@ export default function App() {
 
   // Auth Handlers
   const handleLoginSuccess = (newToken, newUser) => {
-    sessionStorage.setItem('meditrack_token', newToken);
+    setAuthToken(newToken);
     setToken(newToken);
     setUser(newUser);
     setActivePage('dashboard');
   };
 
   const handleRegisterSuccess = (newToken, newUser) => {
-    sessionStorage.setItem('meditrack_token', newToken);
+    setAuthToken(newToken);
     setToken(newToken);
     setUser(newUser);
     setActivePage('dashboard');
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('meditrack_token');
+    clearAuthToken();
     setToken(null);
     setUser(null);
     setActivePage('login');

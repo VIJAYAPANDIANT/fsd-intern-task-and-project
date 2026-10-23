@@ -9,9 +9,19 @@ client/dist/
 
 # Environment configurations
 .env
+.env.*
 .env.local
+client/.env
+client/.env.*
+client/.env.local
 server/.env
+server/.env.*
 server/.env.local
+
+# Atomic write temp files
+*.tmp*
+.*.tmp*
+server/data/.*.tmp*
 
 # Logs
 npm-debug.log*

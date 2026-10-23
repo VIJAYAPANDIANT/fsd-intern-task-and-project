@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Card from '../components/Card';
+import { loginUser } from '../services/authService';
 import { LogIn, Lock, Mail, AlertCircle, Loader2, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export default function Login({ onSwitchToRegister, onLoginSuccess }) {
@@ -49,34 +50,20 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }) {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: formData.email.trim(),
-          password: formData.password
-        })
+      const data = await loginUser({
+        email: formData.email.trim(),
+        password: formData.password
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setApiError(data.message || 'Invalid email or password.');
-        setIsSubmitting(false);
-        return;
-      }
 
       setSuccessMessage('Login successful! Redirecting to dashboard...');
 
       setTimeout(() => {
-        if (onLoginSuccess && data.data) {
-          onLoginSuccess(data.data.token, data.data.user);
+        if (onLoginSuccess && data) {
+          onLoginSuccess(data.token, data.user);
         }
       }, 500);
     } catch (err) {
-      setApiError('Unable to connect to the backend server. Please verify the API is running.');
+      setApiError(err.message || 'Unable to connect to the backend server. Please verify the API is running.');
       setIsSubmitting(false);
     }
   };
