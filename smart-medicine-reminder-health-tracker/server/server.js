@@ -18,7 +18,12 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 // CORS configuration for frontend
 app.use(cors({
-  origin: [CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: [
+    CLIENT_URL,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://health-tracker-khaki-nine.vercel.app'
+  ],
   credentials: true
 }));
 

@@ -2,7 +2,9 @@
 
 Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This repository contains the project code, tasks, and full-stack development implementations completed during the internship.
 
-🌐 **Live Application Link**: [Smart Digital Museum](https://smart-digital-musem.vercel.app/)
+🌐 **Live Application Deployments**:
+- 🏛️ **Project 1 - Smart Digital Museum**: [https://smart-digital-musem.vercel.app/](https://smart-digital-musem.vercel.app/)
+- 💊 **Project 2 - Smart Medicine Reminder & Health Tracker**: [https://health-tracker-khaki-nine.vercel.app/](https://health-tracker-khaki-nine.vercel.app/) &bull; [Backend API](https://health-tracker-backend-neon.vercel.app/)
 
 ---
 
@@ -11,7 +13,7 @@ Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This
 | Directory | Description | Live Demo / Status | Tech Stack | Progress |
 | :--- | :--- | :--- | :--- | :--- |
 | [**`smart-digital-museum/`**](./smart-digital-museum) | Interactive Smart Digital Museum web app featuring 12 artifacts (including 8 Tamil Nadu heritage items), real-time search, filtering, comparison, room tours, year badges, image fallbacks, and dark mode. | [🌐 Live Demo](https://smart-digital-musem.vercel.app/) | React 18, Vite, Tailwind CSS, LocalStorage | **Completed** 🚀 |
-| [**`smart-medicine-reminder-health-tracker/`**](./smart-medicine-reminder-health-tracker) | Full-stack application for managing medication schedules, real-time reminders, adherence tracking (Taken/Missed/Pending), and daily health vitals monitoring. | Localhost (Backend: `:5000`, Client: `:5173`) | React 18, Vite, Tailwind CSS, Node.js, Express, JWT, bcryptjs, JSON Storage | **Completed & Fully Integrated** 🚀 |
+| [**`smart-medicine-reminder-health-tracker/`**](./smart-medicine-reminder-health-tracker) | Full-stack application for managing medication schedules, real-time reminders, adherence tracking (Taken/Missed/Pending), and daily health vitals monitoring. | [🌐 Live Demo](https://health-tracker-khaki-nine.vercel.app/) <br> [⚙️ API](https://health-tracker-backend-neon.vercel.app/) | React 18, Vite, Tailwind CSS, Node.js, Express, JWT, bcryptjs, JSON Storage | **Completed & Fully Integrated** 🚀 |
 
 ---
 
@@ -42,6 +44,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 ## 💊 Project 2: Smart Medicine Reminder & Health Tracker
 
 The **Smart Medicine Reminder & Health Tracker (MediTrack)** is a full-stack medication schedule and health metrics tracking application. It helps individuals and caregivers set dosage schedules, receive dose reminders, monitor daily adherence rates, and track vital health indicators with strict cross-user privacy.
+
+- 🌐 **Live Web Application (Frontend)**: [https://health-tracker-khaki-nine.vercel.app/](https://health-tracker-khaki-nine.vercel.app/)
+- ⚙️ **Live Backend API**: [https://health-tracker-backend-neon.vercel.app/](https://health-tracker-backend-neon.vercel.app/)
+- 🩺 **Live Health Check**: [https://health-tracker-backend-neon.vercel.app/api/health](https://health-tracker-backend-neon.vercel.app/api/health)
 
 ### Key Highlights
 - **Full-Stack REST Architecture**: Decoupled React 18 frontend (Vite + Tailwind CSS) and Node.js/Express backend communicating over REST APIs.
