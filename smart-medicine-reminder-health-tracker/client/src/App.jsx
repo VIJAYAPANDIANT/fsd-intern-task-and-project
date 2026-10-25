@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Medicines from './pages/Medicines';
 import MedicationHistory from './pages/MedicationHistory';
@@ -15,7 +16,7 @@ export default function App() {
   const [token, setToken] = useState(initialToken);
   const [user, setUser] = useState(null);
   const [isAuthLoading, setIsAuthLoading] = useState(Boolean(initialToken));
-  const [activePage, setActivePage] = useState(initialToken ? 'dashboard' : 'login');
+  const [activePage, setActivePage] = useState('home');
   const [backendHealth, setBackendHealth] = useState(null);
   const [backendStatus, setBackendStatus] = useState('checking');
 
@@ -103,7 +104,7 @@ export default function App() {
     clearAuthToken();
     setToken(null);
     setUser(null);
-    setActivePage('login');
+    setActivePage('home');
   };
 
   // Listen for global auth expiration events from API client
@@ -128,6 +129,15 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Public Home Route (Default) */}
+        {activePage === 'home' && (
+          <Home
+            setActivePage={handlePageChange}
+            user={user}
+            backendStatus={backendStatus}
+          />
+        )}
+
         {/* Protected Dashboard Route */}
         {activePage === 'dashboard' && (
           <ProtectedRoute

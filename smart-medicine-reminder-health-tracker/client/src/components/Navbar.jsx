@@ -1,11 +1,14 @@
 import React from 'react';
-import { Pill, Activity, Calendar, History, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { Pill, Activity, Calendar, History, LogIn, UserPlus, LogOut, User, Home } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage, backendStatus, user, onLogout }) {
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Activity },
-    { id: 'medicines', label: 'Medicines', icon: Pill },
-    { id: 'history', label: 'Medication History', icon: History },
+    { id: 'home', label: 'Home', icon: Home },
+    ...(user ? [
+      { id: 'dashboard', label: 'Dashboard', icon: Activity },
+      { id: 'medicines', label: 'Medicines', icon: Pill },
+      { id: 'history', label: 'Medication History', icon: History },
+    ] : []),
   ];
 
   const authItems = [
@@ -20,7 +23,8 @@ export default function Navbar({ activePage, setActivePage, backendStatus, user,
           {/* Logo / Brand */}
           <div
             className="flex items-center space-x-3 cursor-pointer"
-            onClick={() => setActivePage(user ? 'dashboard' : 'login')}
+            onClick={() => setActivePage('home')}
+            title="Go to MediTrack Home"
           >
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
               <Pill className="h-6 w-6" />
