@@ -4,7 +4,7 @@ Welcome to the **FSD Intern Repository** maintained by **Vijayapandian T**. This
 
 🌐 **Live Application Deployments**:
 - 🏛️ **Project 1 - Smart Digital Museum**: [https://smart-digital-musem.vercel.app/](https://smart-digital-musem.vercel.app/)
-- 💊 **Project 2 - Smart Medicine Reminder & Health Tracker**: [https://health-tracker-khaki-nine.vercel.app/](https://health-tracker-khaki-nine.vercel.app/) &bull; [Backend API](https://health-tracker-backend-neon.vercel.app/)
+- 💊 **Project 2 - Smart Medicine Reminder & Health Tracker**: [https://health-tracker-khaki-nine.vercel.app/](https://health-tracker-khaki-nine.vercel.app/)
 
 ---
 

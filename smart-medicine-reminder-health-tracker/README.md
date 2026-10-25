@@ -6,10 +6,8 @@ The **Smart Medicine Reminder & Health Tracker (MediTrack)** is a full-stack hea
 
 This project is developed as part of the Full Stack Web Development (FSD) Internship by **Vijayapandian T**.
 
-🌐 **Live Deployments**:
-- **Frontend Web Application**: [https://health-tracker-khaki-nine.vercel.app/](https://health-tracker-khaki-nine.vercel.app/)
-- **Backend REST API**: [https://health-tracker-backend-neon.vercel.app/](https://health-tracker-backend-neon.vercel.app/)
-- **API Health Check**: [https://health-tracker-backend-neon.vercel.app/api/health](https://health-tracker-backend-neon.vercel.app/api/health)
+🌐 **Live Deployment**:
+- **Live Web Application**: [https://health-tracker-khaki-nine.vercel.app/](https://health-tracker-khaki-nine.vercel.app/)
 
 ---
 
